@@ -13,6 +13,15 @@ class Relogio {
     private int horas;
     private int minutos;
     private int segundos;
+
+    private int horasInicio;
+    private int minutosInicio;
+    private int segundosInicio;
+
+    private int horasTermino;
+    private int minutosTermino;
+    private int segundosTermino;
+
     private DateTimeFormatter formato24h = DateTimeFormatter.ofPattern("HH:mm:ss");
     private DateTimeFormatter formatoAMPM = DateTimeFormatter.ofPattern("hh:mm a");
 
@@ -30,11 +39,9 @@ class Relogio {
         this.segundos = 0;
     }
 
-    // certo
-    public String cronometro(int horaInicio, int minutosInicio, int segundosInicio, int horaTermino, int minutosTermino,
-            int segundosTermino) {
-        int totalSegundosInicio = horaInicio * 3600 + minutosInicio * 60 + segundosInicio;
-        int totalSegundosTermino = horaTermino * 3600 + minutosTermino * 60 + segundosTermino;
+    public String cronometro() {
+        int totalSegundosInicio = this.horasInicio * 3600 + this.minutosInicio * 60 + this.segundosInicio;
+        int totalSegundosTermino = this.horasTermino * 3600 + this.minutosTermino * 60 + this.segundosTermino;
 
         int segundosDecorridos = totalSegundosTermino - totalSegundosInicio;
         int horasDecorridas = segundosDecorridos / 3600;
@@ -42,6 +49,18 @@ class Relogio {
         int segundosRestantes = segundosDecorridos % 60;
 
         return String.format("%02d:%02d:%02d", horasDecorridas, minutosDecorridos, segundosRestantes);
+    }
+
+    public void marcarInicioIntervalo(int hora, int minutos, int segundos) {
+        this.horasInicio = hora;
+        this.minutosInicio = minutos;
+        this.segundosInicio = segundos;
+    }
+
+    public void marcarFimIntervalo(int hora, int minutos, int segundos) {
+        this.horasTermino = hora;
+        this.minutosTermino = minutos;
+        this.segundosTermino = segundos;
     }
 
     // certo
@@ -65,6 +84,7 @@ class Relogio {
         return formato24h.format(localTime);
     }
 
+    // certo
     public String atualizarHorarioAMPM() {
         LocalTime localTime = LocalTime.now();
         this.horas = localTime.getHour();
@@ -72,8 +92,6 @@ class Relogio {
         this.segundos = localTime.getSecond();
         return formatoAMPM.format(localTime);
     }
-
-    
 
     public static void main(String[] args) {
         Relogio relogio = new Relogio();
@@ -108,7 +126,6 @@ class Relogio {
                     break;
                 case 3:
                     System.out.println("Informe a hora de início: ");
-                    System.out.print("Informe a hora: ");
                     int horaInicio = relogio.lerValorInteiro(scanner, 0, 23);
                     System.out.print("Informe os minutos: ");
                     int minutosInicio = relogio.lerValorInteiro(scanner, 0, 59);
@@ -116,15 +133,16 @@ class Relogio {
                     int segundosInicio = relogio.lerValorInteiro(scanner, 0, 59);
 
                     System.out.println("Informe a hora de término: ");
-                    System.out.print("Informe a hora: ");
                     int horaTermino = relogio.lerValorInteiro(scanner, 0, 23);
                     System.out.print("Informe os minutos: ");
                     int minutosTermino = relogio.lerValorInteiro(scanner, 0, 59);
                     System.out.print("Informe os segundos: ");
                     int segundosTermino = relogio.lerValorInteiro(scanner, 0, 59);
 
-                    String tempoDecorrido = relogio.cronometro(horaInicio, minutosInicio, segundosInicio, horaTermino,
-                            minutosTermino, segundosTermino);
+                    relogio.marcarInicioIntervalo(horaInicio, minutosInicio, segundosInicio);
+                    relogio.marcarFimIntervalo(horaTermino, minutosTermino, segundosTermino);
+
+                    String tempoDecorrido = relogio.cronometro();
                     System.out.println("Tempo decorrido: " + tempoDecorrido);
                     break;
                 case 4:
@@ -155,6 +173,7 @@ class Relogio {
         }
         scanner.close();
     }
+
     private int lerValorInteiro(Scanner scanner, int limiteInferior, int limiteSuperior) {
         int valor;
         do {
