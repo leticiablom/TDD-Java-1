@@ -1,73 +1,74 @@
 package com.example;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 
 /**
  * Testes Unit para a classe Relogio
  */
-
 class RelogioTest {
 
-    Relogio relogio = new Relogio();
+    private Relogio relogio;
+    private DateTimeFormatter formato24h = DateTimeFormatter.ofPattern("HH:mm:ss");
+    private DateTimeFormatter formatoAMPM = DateTimeFormatter.ofPattern("hh:mm a");
+
+    @BeforeEach
+    void setUp() {
+        relogio = new Relogio();
+    }
 
     @Test
     void testDefinirHorario() {
-
         relogio.definirHorario(10, 30, 0);
-        int result = relogio.obterHorario();
-        assertEquals("10:30:00", result);
+        assertEquals("10:30:00", relogio.imprimirFormato24h());
     }
 
     @Test
     void testReiniciarMeiaNoite() {
-
-        // setando horario diferente de meia noite
         relogio.definirHorario(15, 45, 30);
-
         relogio.reiniciarMeiaNoite();
-        int result = relogio.obterHorario();
-        assertEquals("00:00:00", result);
+        assertEquals("00:00:00", relogio.imprimirFormato24h());
     }
 
     @Test
     void testMarcarIntervaloTempo() {
-
-        // setando horario
-        relogio.definirHorario(8, 0, 0);
-        relogio.marcarInicioIntervalo();
-
-        //
-        relogio.definirHorario(8, 30, 0);
-        relogio.marcarFimIntervalo();
-        int result = relogio.obterTempoDecorrido();
-        assertEquals("00:30:00", result);
+        relogio.marcarInicioIntervalo(8, 0, 0);
+        relogio.marcarFimIntervalo(8, 30, 0);
+        assertEquals("00:30:00", relogio.cronometro());
     }
 
     @Test
     void testImprimirFormato24h() {
-
         relogio.definirHorario(18, 15, 0);
-        int result = relogio.imprimirFormato24h();
-        assertEquals("18:15:00", result);
+        assertEquals("18:15:00", relogio.imprimirFormato24h());
     }
 
     @Test
     void testImprimirFormatoAMPM() {
-
         relogio.definirHorario(10, 45, 0);
-        int result = relogio.imprimirFormatoAMPM();
-        assertEquals("10:45 AM", result);
+        assertEquals("10:45 AM", relogio.imprimirFormatoAMPM());
     }
 
     @Test
     void testAtualizarHorario() {
+        LocalTime localTime = LocalTime.now();
+        relogio.definirHorario(23, 59, 0);
+        relogio.atualizarHorario24h();
+        assertEquals(formato24h.format(localTime), relogio.imprimirFormato24h());
 
         relogio.definirHorario(23, 59, 0);
-        // Simula passagem de tempo...
-        relogio.atualizarHorario();
-        int result = relogio.obterHorario();
-        assertEquals("00:00:00", result);
+        relogio.atualizarHorarioAMPM();
+        assertEquals(formatoAMPM.format(localTime), relogio.imprimirFormatoAMPM());
     }
 
+    @Test
+    void testCronometro() {
+        relogio.marcarInicioIntervalo(10, 0, 0);
+        relogio.marcarFimIntervalo(11, 30, 0);
+        String tempoDecorrido = relogio.cronometro();
+        assertEquals("01:30:00", tempoDecorrido);
+    }
 }
